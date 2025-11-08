@@ -1,3 +1,4 @@
 __pycache__/
 test1.mp4
 secrets.py
+.env

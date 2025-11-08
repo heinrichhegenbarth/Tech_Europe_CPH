@@ -1,0 +1,116 @@
+[
+  {
+    "second": 0,
+    "overall_action": "leisure",
+    "sub_action": "socializing",
+    "short_description": ""
+  },
+  {
+    "second": 1,
+    "overall_action": "food",
+    "sub_action": "",
+    "short_description": ""
+  },
+  {
+    "second": 2,
+    "overall_action": "leisure",
+    "sub_action": "socializing",
+    "short_description": ""
+  },
+  {
+    "second": 3,
+    "overall_action": "leisure",
+    "sub_action": "socializing",
+    "short_description": ""
+  },
+  {
+    "second": 4,
+    "overall_action": "leisure",
+    "sub_action": "socializing",
+    "short_description": ""
+  },
+  {
+    "second": 5,
+    "overall_action": "food",
+    "sub_action": "",
+    "short_description": ""
+  },
+  {
+    "second": 6,
+    "overall_action": "work",
+    "sub_action": "sitting",
+    "short_description": ""
+  },
+  {
+    "second": 7,
+    "overall_action": "work",
+    "sub_action": "sitting",
+    "short_description": ""
+  },
+  {
+    "second": 8,
+    "overall_action": "work",
+    "sub_action": "sitting",
+    "short_description": ""
+  },
+  {
+    "second": 9,
+    "overall_action": "work",
+    "sub_action": "sitting",
+    "short_description": ""
+  },
+  {
+    "second": 10,
+    "overall_action": "food",
+    "sub_action": "",
+    "short_description": ""
+  },
+  {
+    "second": 11,
+    "overall_action": "food",
+    "sub_action": "",
+    "short_description": ""
+  },
+  {
+    "second": 12,
+    "overall_action": "food",
+    "sub_action": "",
+    "short_description": ""
+  },
+  {
+    "second": 13,
+    "overall_action": "leisure",
+    "sub_action": "socializing",
+    "short_description": ""
+  },
+  {
+    "second": 14,
+    "overall_action": "work",
+    "sub_action": "standing",
+    "short_description": ""
+  },
+  {
+    "second": 15,
+    "overall_action": "work",
+    "sub_action": "standing",
+    "short_description": ""
+  },
+  {
+    "second": 16,
+    "overall_action": "leisure",
+    "sub_action": "walking",
+    "short_description": ""
+  },
+  {
+    "second": 17,
+    "overall_action": "leisure",
+    "sub_action": "walking",
+    "short_description": ""
+  },
+  {
+    "second": 18,
+    "overall_action": "work",
+    "sub_action": "standing",
+    "short_description": ""
+  }
+]

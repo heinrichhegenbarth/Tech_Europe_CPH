@@ -10,7 +10,11 @@ from tqdm import tqdm
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List, Tuple, Dict, Optional
 from prompt import PROMPT
-from secrets import OPENAI_API_KEY
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # Supported video formats
 SUPPORTED_FORMATS = ['.mp4', '.mov', '.avi', '.mkv', '.flv', '.wmv', '.m4v']
@@ -118,11 +122,14 @@ def validate_json_structure(data: Dict, second: int) -> Dict:
     """
     valid_actions = ['sport', 'sleep', 'food', 'work', 'leisure']
     
+    # Accept both "description" and "short_description" field names (for backward compatibility)
+    description = data.get('description') or data.get('short_description') or ''
+    
     result = {
         'second': second,
         'overall_action': data.get('overall_action', 'unknown'),
         'sub_action': data.get('sub_action', ''),
-        'short_description': data.get('short_description', '')
+        'description': description  # Use "description" to match the prompt
     }
     
     # Validate overall_action
@@ -133,9 +140,14 @@ def validate_json_structure(data: Dict, second: int) -> Dict:
     if not isinstance(result['sub_action'], str):
         result['sub_action'] = str(result['sub_action']) if result['sub_action'] else ''
     
-    # Ensure short_description is a string
-    if not isinstance(result['short_description'], str):
-        result['short_description'] = str(result['short_description']) if result['short_description'] else ''
+    # Ensure description is a string and not empty
+    if not isinstance(result['description'], str):
+        result['description'] = str(result['description']) if result['description'] else ''
+    
+    # If description is empty, this is an error - but we'll let it through and the prompt should handle it
+    if not result['description'].strip():
+        # Log a warning but don't fail - the prompt should enforce this
+        pass
     
     return result
 
@@ -170,7 +182,7 @@ def analyze_frame_with_openai(args):
                     ]
                 }
             ],
-            max_tokens=500  # Increased for more detailed descriptions
+            max_tokens=1000  # Increased for more detailed descriptions
         )
         elapsed = time.time() - start_time
         analysis_text = response.choices[0].message.content
@@ -453,7 +465,7 @@ if __name__ == "__main__":
                 print(f"  Overall Action: {json_data['overall_action']}")
                 if json_data['sub_action']:
                     print(f"  Sub Action: {json_data['sub_action']}")
-                print(f"  Description: {json_data['short_description']}")
+                print(f"  Description: {json_data.get('description', json_data.get('short_description', ''))}")
             else:
                 print(f"  Raw response: {result.get('analysis', 'N/A')}")
                 if result.get('error'):

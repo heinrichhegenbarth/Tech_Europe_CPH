@@ -1,0 +1,26 @@
+[
+  {
+    "second": 0,
+    "overall_action": "work",
+    "sub_action": "standing",
+    "description": "A person is holding up a yellow apple in an office setting. The room has a modern appearance with a tall ceiling and a glass partition. A large monitor displays a webpage titled 'Connect your sources' with various options related to health devices. On the table, there are multiple objects including a laptop, a can of cola, disposable cups, a remote control, and papers. The person may be preparing to eat the apple or using it as a point of discussion during a presentation or meeting."
+  },
+  {
+    "second": 1,
+    "overall_action": "work",
+    "sub_action": "sitting",
+    "description": "The image depicts a meeting room with a large screen displaying a webpage titled 'Connect your sources.' The room has a modern design with a wooden ceiling and a glass wall. On the table, there are several items: a closed laptop, a can of cola, a paper cup, a glass with some liquid, some cables, and a few electronic devices. There is also a sandwich wrapper and a can of vegetable drink. Chairs surround the table, indicating a work environment where people might collaborate on technical tasks or discuss projects."
+  },
+  {
+    "second": 2,
+    "overall_action": "work",
+    "sub_action": "sitting",
+    "description": "The image shows a modern office meeting room with a table covered in various items suggesting a work environment. There are laptops and papers indicating an ongoing meeting or a work session. A large screen at the front displays a webpage titled 'Connect your sources,' which appears to be part of a work presentation or discussion. Drinks, including a can of Coca-Cola and a cup of coffee, are present, along with some food wrappers on the table, hinting that the participants may be having snacks or refreshments during their meeting. Chairs are arranged around the table, and the room is well-lit, providing a conducive environment for work activities."
+  },
+  {
+    "second": 3,
+    "overall_action": "food",
+    "sub_action": "",
+    "description": "The image shows a close-up of a person holding a bitten apple in their hand, suggesting they are in the process of eating it. The setting is an office or workspace environment with a large screen displaying a webpage or software interface in the background, indicating a possible work-related scenario. On the desk, there are various objects including a soda can, a paper cup, and a glass of water, along with some electronic devices and cables. The scene conveys a casual, everyday work break where the person is snacking while potentially taking a short pause from work activities."
+  }
+]
