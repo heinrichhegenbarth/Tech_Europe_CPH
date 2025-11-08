@@ -9,8 +9,6 @@ import json
 import re
 import requests
 from typing import Optional, Dict, Any
-from contextlib import redirect_stdout, redirect_stderr
-from io import StringIO
 import sample
 from prompt import PROMPT
 from dotenv import load_dotenv
@@ -74,6 +72,11 @@ async def send_to_dust(frames_data: Dict[str, Any]) -> Dict[str, Any]:
             detail="Dust API configuration incomplete. Please set API_KEY, WORKSPACE_ID, and HEALTH_AGENT_ID environment variables."
         )
     
+    print(f"[DUST] Preparing request to Dust API...")
+    print(f"[DUST] Workspace ID: {WORKSPACE_ID}")
+    print(f"[DUST] Health Agent ID: {HEALTH_AGENT_ID}")
+    print(f"[DUST] Timezone: {TIMEZONE}")
+    
     url = f"{DUST_API_BASE}/api/v1/w/{WORKSPACE_ID}/assistant/conversations"
     headers = {
         "Authorization": f"Bearer {API_KEY}",
@@ -81,6 +84,8 @@ async def send_to_dust(frames_data: Dict[str, Any]) -> Dict[str, Any]:
     }
     
     content = "INPUT_JSON:\n" + json.dumps(frames_data, ensure_ascii=False)
+    print(f"[DUST] Request payload size: {len(content)} characters")
+    print(f"[DUST] Number of frames: {frames_data.get('total_frames', 0)}")
     
     payload = {
         "message": {
@@ -94,29 +99,41 @@ async def send_to_dust(frames_data: Dict[str, Any]) -> Dict[str, Any]:
     }
     
     try:
+        print(f"[DUST] Sending POST request to: {url}")
+        print(f"[DUST] Waiting for response (timeout: 180s)...")
         resp = requests.post(url, headers=headers, json=payload, timeout=180)
         resp.raise_for_status()
+        print(f"[DUST] Received response with status: {resp.status_code}")
         data = resp.json()
         
+        print(f"[DUST] Extracting assistant content from response...")
         assistant_text = extract_assistant_content(data)
         if not assistant_text:
+            print(f"[DUST] ERROR: Could not find assistant content in response")
             raise HTTPException(
                 status_code=500,
                 detail="Could not find assistant content in Dust response"
             )
         
+        print(f"[DUST] Assistant content length: {len(assistant_text)} characters")
+        print(f"[DUST] Stripping code fences and parsing JSON...")
         # Strip code fences and parse JSON
         inner = strip_code_fences(assistant_text)
         try:
             parsed = json.loads(inner)
+            print(f"[DUST] Successfully parsed JSON response")
+            print(f"[DUST] Response contains keys: {list(parsed.keys()) if isinstance(parsed, dict) else 'N/A'}")
             return parsed
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as e:
+            print(f"[DUST] WARNING: Response was not valid JSON: {str(e)}")
+            print(f"[DUST] Returning raw response")
             # If not valid JSON, return the raw text wrapped in a response
             return {
                 "raw_response": assistant_text,
                 "note": "Dust response was not valid JSON"
             }
     except requests.exceptions.RequestException as e:
+        print(f"[DUST] ERROR: Request failed: {str(e)}")
         raise HTTPException(
             status_code=500,
             detail=f"Error calling Dust API: {str(e)}"
@@ -163,16 +180,18 @@ async def analyze_video(
             tmp_file.write(content)
             tmp_file_path = tmp_file.name
             
-            # Process video (completely silent - suppress all output)
-            with redirect_stdout(StringIO()), redirect_stderr(StringIO()):
-                results = sample.process_video(
-                    tmp_file_path,
-                    prompt=PROMPT,
-                    max_workers=max_workers,
-                    verbose=False
-                )
+            # Process video with verbose output
+            print(f"\n[API] Starting video analysis for file: {file.filename}")
+            print(f"[API] Using {max_workers} parallel workers")
+            results = sample.process_video(
+                tmp_file_path,
+                prompt=PROMPT,
+                max_workers=max_workers,
+                verbose=True
+            )
             
             # Extract only the parsed JSON data
+            print(f"\n[API] Extracting parsed JSON data from results...")
             json_data_list = []
             for result in results:
                 if result.get('success') and result.get('parsed_json'):
@@ -181,8 +200,10 @@ async def analyze_video(
             # Check if all succeeded
             total_frames = len(results)
             successful = len(json_data_list)
+            print(f"[API] Successfully parsed {successful}/{total_frames} frames")
             
             # Format data for Dust API
+            print(f"\n[API] Formatting data for Dust API...")
             frames_object = {
                 "status": "success" if successful == total_frames else "partial_success",
                 "message": "All frames analyzed successfully" if successful == total_frames else f"Processed {successful}/{total_frames} frames successfully",
@@ -191,7 +212,10 @@ async def analyze_video(
             }
             
             # Send to Dust API and return its response
+            print(f"[API] Sending {total_frames} frames to Dust API...")
             dust_response = await send_to_dust(frames_object)
+            print(f"[API] Received response from Dust API")
+            print(f"[API] Response keys: {list(dust_response.keys()) if isinstance(dust_response, dict) else 'N/A'}")
             return JSONResponse(content=dust_response)
                 
         except Exception as e:
@@ -242,16 +266,19 @@ async def analyze_video_base64(request: Base64VideoRequest):
             tmp_file.write(video_bytes)
             tmp_file_path = tmp_file.name
             
-            # Process video (completely silent - suppress all output)
-            with redirect_stdout(StringIO()), redirect_stderr(StringIO()):
-                results = sample.process_video(
-                    tmp_file_path,
-                    prompt=PROMPT,
-                    max_workers=request.max_workers,
-                    verbose=False
-                )
+            # Process video with verbose output
+            print(f"\n[API] Starting video analysis for base64 encoded video")
+            print(f"[API] File extension: {file_ext}")
+            print(f"[API] Using {request.max_workers} parallel workers")
+            results = sample.process_video(
+                tmp_file_path,
+                prompt=PROMPT,
+                max_workers=request.max_workers,
+                verbose=True
+            )
             
             # Extract only the parsed JSON data
+            print(f"\n[API] Extracting parsed JSON data from results...")
             json_data_list = []
             for result in results:
                 if result.get('success') and result.get('parsed_json'):
@@ -260,8 +287,10 @@ async def analyze_video_base64(request: Base64VideoRequest):
             # Check if all succeeded
             total_frames = len(results)
             successful = len(json_data_list)
+            print(f"[API] Successfully parsed {successful}/{total_frames} frames")
             
             # Format data for Dust API
+            print(f"\n[API] Formatting data for Dust API...")
             frames_object = {
                 "status": "success" if successful == total_frames else "partial_success",
                 "message": "All frames analyzed successfully" if successful == total_frames else f"Processed {successful}/{total_frames} frames successfully",
@@ -270,7 +299,10 @@ async def analyze_video_base64(request: Base64VideoRequest):
             }
             
             # Send to Dust API and return its response
+            print(f"[API] Sending {total_frames} frames to Dust API...")
             dust_response = await send_to_dust(frames_object)
+            print(f"[API] Received response from Dust API")
+            print(f"[API] Response keys: {list(dust_response.keys()) if isinstance(dust_response, dict) else 'N/A'}")
             return JSONResponse(content=dust_response)
                 
         except Exception as e:
